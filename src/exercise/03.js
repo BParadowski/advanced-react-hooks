@@ -3,6 +3,26 @@
 
 import * as React from 'react'
 
+const countContext = React.createContext()
+
+function CountProvider({children}) {
+  const [count, setCount] = React.useState(0)
+  return (
+    <countContext.Provider value={[count, setCount]}>
+      {children}
+    </countContext.Provider>
+  )
+}
+
+function useCount() {
+  const context = React.useContext(countContext)
+  if (!context) {
+    throw new Error("Can't use count outside CountProvider component")
+  }
+
+  return context
+}
+
 // 🐨 create your CountContext here with React.createContext
 
 // 🐨 create a CountProvider component here that does this:
@@ -13,13 +33,14 @@ import * as React from 'react'
 
 function CountDisplay() {
   // 🐨 get the count from useContext with the CountContext
-  const count = 0
+  const [count, setCount] = useCount()
+
   return <div>{`The current count is ${count}`}</div>
 }
 
 function Counter() {
   // 🐨 get the setCount from useContext with the CountContext
-  const setCount = () => {}
+  const [count, setCount] = useCount()
   const increment = () => setCount(c => c + 1)
   return <button onClick={increment}>Increment count</button>
 }
@@ -31,8 +52,10 @@ function App() {
         🐨 wrap these two components in the CountProvider so they can access
         the CountContext value
       */}
-      <CountDisplay />
-      <Counter />
+      <CountProvider>
+        <CountDisplay />
+        <Counter />
+      </CountProvider>
     </div>
   )
 }
